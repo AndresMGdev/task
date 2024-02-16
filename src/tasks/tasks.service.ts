@@ -17,7 +17,8 @@ export class TasksService {
 
 
   async create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+      const task = this.taskRepository.create(createTaskDto)
+      return await this.taskRepository.save(task);
   }
 
   async findAll() {
@@ -25,14 +26,14 @@ export class TasksService {
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} task`;
+    return await this.taskRepository.findOneBy({id});
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+    return await this.taskRepository.update(id, updateTaskDto);
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} task`;
+    return await this.taskRepository.softDelete({id});
   }
 }

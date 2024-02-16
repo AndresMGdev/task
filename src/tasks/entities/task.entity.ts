@@ -7,23 +7,17 @@ export class Task {
     @Column({primary: true, generated: true})
     id: number;
 
-    @Column()
+    @Column({length: 100})
     title: string;
 
-    @Column()
+    @Column({length: 255})
     description: string;
 
-    @Column()
+    @Column({length: 1000})
     text: string;
 
-    @Column()
-    state: boolean;
-
-    @Column()
-    dateStart: Date;
-
-    @Column()
-    dateEnd: Date;
+    @Column("bool")
+    isActive: boolean;
 
     @DeleteDateColumn()
     deleteAt: Date;
