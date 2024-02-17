@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { Task } from 'src/tasks/entities/task.entity';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Task)
+    private readonly taskRepository: Repository<Task>,
+  ){
+
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async create(createUserDto: CreateUserDto) {
+    const user = this.userRepository.create(createUserDto)
+    return await this.userRepository.save(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findAll() {
+    return await this.userRepository.find();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOne(id: number) {
+    return await this.userRepository
+    .createQueryBuilder('user')
+      .leftJoinAndSelect('user.tasks', 'task')
+      .leftJoin('task.user', 'taskUser')
+      .addSelect(['taskUser.id', 'taskUser.userName'])
+      .addSelect(['user.id', 'user.userName'])
+      .leftJoin('task.assignedUsers', 'assignedUser')
+      .addSelect(['assignedUser.id', 'assignedUser.userName'])
+      .leftJoinAndSelect('user.assignedTasks', 'assignedTask')
+      .leftJoin('assignedTask.user', 'assignedTaskUser')
+      .addSelect(['assignedTaskUser.id', 'assignedTaskUser.userName'])
+      .where('user.id = :id', { id })
+      .getOne();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    return await this.userRepository.update(id, updateUserDto);
+  }
+
+  async remove(id: number) {
+    return await this.userRepository.softDelete({id});
   }
 }

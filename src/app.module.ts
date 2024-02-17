@@ -15,6 +15,7 @@ import { UsersModule } from './users/users.module';
       database: "db_task",
       autoLoadEntities: true,
       synchronize: true,
+      // logging: true,
     }),
     UsersModule
   ],

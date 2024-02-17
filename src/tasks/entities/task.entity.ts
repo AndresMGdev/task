@@ -1,6 +1,7 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, DeleteDateColumn, Entity, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 
-@Entity()
+@Entity("Task")
 export class Task {
 
     // @PrimaryGeneratedColumn
@@ -21,4 +22,21 @@ export class Task {
 
     @DeleteDateColumn()
     deleteAt: Date;
+
+    @ManyToOne(() => User, (user) => user.id)
+    user: User;
+
+    @ManyToMany(() => User, (user) => user.assignedTasks)
+    @JoinTable({
+        name: 'user_task',
+        joinColumn: {
+            name: 'task_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'user_id',
+            referencedColumnName: 'id',
+        },
+    })
+    assignedUsers?: User[];
 }
